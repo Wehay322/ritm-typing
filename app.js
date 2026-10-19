@@ -105,7 +105,12 @@ document.querySelectorAll('[data-language]').forEach(button => button.addEventLi
   reset();
 }));
 $('restart').addEventListener('click', () => reset({focus: true}));
-document.addEventListener('keydown', event => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); reset({focus: true}); } });
+document.addEventListener('keydown', event => {
+  if (event.key === 'Tab' && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    event.preventDefault();
+    if (!event.repeat) reset({focus: true});
+  }
+});
 document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
 window.addEventListener('pageshow', tick);
 reset();
