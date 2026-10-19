@@ -7,25 +7,19 @@
   <meta name="description" content="Найдите свой ритм печати. Случайные тексты, скорость и точность в простом тренажёре без лишнего.">
   <title>Ритм — тренажёр печати</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%232e624e'/%3E%3Cpath d='M12 23v-6m8 12V11m8 12v-6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=clean-layout-2">
 </head>
 <body>
   <div class="page">
     <header class="header">
       <a class="brand" href="./" aria-label="Ритм — на главную">
         <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M9 19v-6m7 12V7m7 12v-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></span>
-        <span>ритм<span class="brand-dot">.</span></span>
+        <span>ритм</span>
       </a>
       <span class="header-note">Тренажёр печати</span>
     </header>
 
-    <main>
-      <section class="intro" aria-labelledby="heading">
-        <p class="eyebrow"><span class="small-line"></span> МЕНЬШЕ МЫСЛЕЙ. БОЛЬШЕ ПРАКТИКИ.</p>
-        <h1 id="heading">В своём ритме<span>.</span></h1>
-        <p class="subtitle">Печатайте текст. Следите за скоростью. Становитесь лучше.</p>
-      </section>
-
+    <main aria-label="Тренажёр печати">
       <section class="trainer" aria-label="Тренировка печати">
         <div class="settings">
           <div class="setting-group"><span class="setting-label" id="duration-label">Время</span>
@@ -67,7 +61,7 @@
       </section>
     </main>
 
-    <footer><span>Немного практики каждый день.</span><span class="best">Личный рекорд <span id="best-value">—</span></span></footer>
+    <footer class="footer-record"><span class="best">Личный рекорд <span id="best-value">—</span></span></footer>
   </div>
   <script type="module" src="./app.js?v=5195ef4"></script>
 </body>
