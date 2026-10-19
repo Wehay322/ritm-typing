@@ -7,7 +7,7 @@
   <meta name="description" content="Найдите свой ритм печати. Случайные тексты, скорость и точность в простом тренажёре без лишнего.">
   <title>Ритм - тренажёр печати</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%232e624e'/%3E%3Cpath d='M12 23v-6m8 12V11m8 12v-6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./styles.css?v=clean-layout-2">
+  <link rel="stylesheet" href="./styles.css?v=attempt-history-1">
 </head>
 <body>
   <div class="page">
@@ -59,10 +59,19 @@
 
         <div class="actions"><p id="input-help">Таймер начнётся с первой буквы</p><button id="restart" class="restart-button" type="button" aria-keyshortcuts="Shift+Tab" title="Начать заново (Shift+Tab)"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="M4 7a6.5 6.5 0 1 1-.2 5M4 3v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Начать заново</span><kbd>Shift + Tab</kbd></button></div>
       </section>
+      <section class="attempt-history" aria-labelledby="history-heading">
+        <div class="history-heading"><h2 id="history-heading">Последние 5 попыток</h2><span class="best">Личный рекорд <span id="best-value">-</span></span></div>
+        <p id="history-empty" class="history-empty">Здесь появятся результаты завершённых попыток.</p>
+        <div class="history-scroll">
+          <table id="history-table" class="history-table" hidden>
+            <caption class="sr-only">Последние пять завершённых попыток, сначала новые</caption>
+            <thead><tr><th scope="col">Дата</th><th scope="col">Скорость</th><th scope="col">Точность</th><th scope="col">Режим</th></tr></thead>
+            <tbody id="history-rows"></tbody>
+          </table>
+        </div>
+      </section>
     </main>
-
-    <footer class="footer-record"><span class="best">Личный рекорд <span id="best-value">-</span></span></footer>
   </div>
-  <script type="module" src="./app.js?v=shift-tab-1"></script>
+  <script type="module" src="./app.js?v=attempt-history-1"></script>
 </body>
 </html>

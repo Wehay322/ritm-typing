@@ -10,6 +10,46 @@ let characters = [];
 const storageKey = () => `ritm-best-v1-${language}-${duration}`;
 function getBest() { try { return Math.max(0, Number(localStorage.getItem(storageKey())) || 0); } catch { return 0; } }
 function showBest() { const best = getBest(); $('best-value').textContent = best ? `${best} зн/мин` : '-'; }
+const attemptHistoryKey = 'ritm-attempts-v1';
+function loadAttempts() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(attemptHistoryKey) || '[]');
+    if (!Array.isArray(stored)) return [];
+    return stored.filter(attempt => attempt && Number.isFinite(attempt.speed) && attempt.speed >= 0 &&
+      Number.isFinite(attempt.accuracy) && attempt.accuracy >= 0 && attempt.accuracy <= 100 &&
+      ['ru', 'en'].includes(attempt.language) && [30, 60, 120].includes(attempt.duration) &&
+      typeof attempt.finishedAt === 'number' && Number.isFinite(new Date(attempt.finishedAt).getTime())).slice(0, 5);
+  } catch { return []; }
+}
+let attemptHistory = loadAttempts();
+function renderAttempts() {
+  const rows = attemptHistory.map(attempt => {
+    const row = document.createElement('tr');
+    const date = new Date(attempt.finishedAt);
+    const dateCell = document.createElement('td');
+    const time = document.createElement('time');
+    time.dateTime = date.toISOString();
+    time.title = date.toLocaleString('ru-RU');
+    time.textContent = date.toLocaleString('ru-RU', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'});
+    dateCell.append(time);
+    const speedCell = document.createElement('td'); speedCell.className = 'history-speed';
+    const unit = document.createElement('span'); unit.className = 'history-unit'; unit.textContent = ' зн/мин';
+    speedCell.append(document.createTextNode(String(attempt.speed)), unit);
+    const accuracyCell = document.createElement('td'); accuracyCell.textContent = `${attempt.accuracy}%`;
+    const modeCell = document.createElement('td'); modeCell.textContent = `${attempt.duration} с · ${attempt.language.toUpperCase()}`;
+    row.append(dateCell, speedCell, accuracyCell, modeCell);
+    return row;
+  });
+  $('history-rows').replaceChildren(...rows);
+  $('history-table').hidden = rows.length === 0;
+  $('history-empty').hidden = rows.length !== 0;
+}
+function rememberAttempt(result) {
+  attemptHistory = [{speed: result.speed, accuracy: result.accuracy, duration, language,
+    elapsedMs: finalElapsed, finishedAt: Date.now()}, ...attemptHistory].slice(0, 5);
+  try { localStorage.setItem(attemptHistoryKey, JSON.stringify(attemptHistory)); } catch {}
+  renderAttempts();
+}
 function elapsed() { return startedAt === null ? 0 : Math.min(duration * 1000, Math.max(0, performance.now() - startedAt)); }
 function setStatus(text, active = false) {
   const dot = document.createElement('span'); dot.className = `status-dot${active ? ' active' : ''}`;
@@ -61,6 +101,7 @@ function finish() {
   if (phase !== 'running') return;
   finalElapsed = elapsed(); phase = 'finished'; clearInterval(timerId); timerId = null;
   const result = refreshStats(finalElapsed);
+  rememberAttempt(result);
   const best = getBest();
   const isRecord = result.speed > best && finalElapsed >= 5000;
   if (isRecord) { try { localStorage.setItem(storageKey(), String(result.speed)); } catch {} }
@@ -114,3 +155,4 @@ document.addEventListener('keydown', event => {
 document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
 window.addEventListener('pageshow', tick);
 reset();
+renderAttempts();
