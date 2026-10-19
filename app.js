@@ -1,4 +1,4 @@
-import {generateText, measure, clockText, countNewInput} from './core.mjs';
+import {generateText, measure, clockText, countNewInput} from './core.mjs?v=ascii-hyphen-1';
 
 const $ = id => document.getElementById(id);
 const input = $('typing-input');
@@ -9,7 +9,7 @@ let phase = 'idle', timerId = null, attempts = 0, wrongAttempts = 0, finalElapse
 let characters = [];
 const storageKey = () => `ritm-best-v1-${language}-${duration}`;
 function getBest() { try { return Math.max(0, Number(localStorage.getItem(storageKey())) || 0); } catch { return 0; } }
-function showBest() { const best = getBest(); $('best-value').textContent = best ? `${best} зн/мин` : '—'; }
+function showBest() { const best = getBest(); $('best-value').textContent = best ? `${best} зн/мин` : '-'; }
 function elapsed() { return startedAt === null ? 0 : Math.min(duration * 1000, Math.max(0, performance.now() - startedAt)); }
 function setStatus(text, active = false) {
   const dot = document.createElement('span'); dot.className = `status-dot${active ? ' active' : ''}`;
@@ -69,7 +69,7 @@ function finish() {
   $('result-description').textContent = `${result.speed} знаков в минуту · точность ${result.accuracy}% · верных знаков: ${result.correct}.`;
   $('result').hidden = false;
   reset({keepResult: true, focus: document.activeElement === input});
-  setStatus('Новый текст готов — продолжайте');
+  setStatus('Новый текст готов - продолжайте');
   $('input-help').textContent = 'Следующий раунд начнётся с первой буквы';
 }
 function tick() { if (phase !== 'running') return; if (elapsed() >= duration * 1000) finish(); else refreshStats(); }
