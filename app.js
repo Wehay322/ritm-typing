@@ -41,15 +41,16 @@ function paintCharacters() {
 function changeSettingsDisabled(disabled) {
   document.querySelectorAll('[data-duration], [data-language]').forEach(button => { button.disabled = disabled; });
 }
-function reset({newText = true, focus = false} = {}) {
+function reset({focus = false, keepResult = false} = {}) {
   clearInterval(timerId); timerId = null; startedAt = null; phase = 'idle'; typed = ''; attempts = 0; wrongAttempts = 0; finalElapsed = 0;
-  if (newText) target = generateText(language, Math.random, target);
+  target = generateText(language, Math.random, target);
   characters = Array.from(target, character => { const span = document.createElement('span'); span.className = 'char'; span.textContent = character; span.setAttribute('aria-hidden', 'true'); return span; });
   const readableText = document.createElement('span'); readableText.className = 'sr-only'; readableText.textContent = target;
   targetElement.replaceChildren(readableText, ...characters);
   input.value = ''; input.disabled = false; input.maxLength = target.length; input.lang = language;
   input.placeholder = 'Начните печатать здесь…';
-  $('typing-card').classList.remove('finished'); $('result').hidden = true; $('record-label').hidden = true;
+  $('typing-card').classList.remove('finished');
+  if (!keepResult) { $('result').hidden = true; $('record-label').hidden = true; }
   $('input-help').textContent = 'Таймер начнётся с первой буквы';
   $('restart').querySelector('span').textContent = 'Начать заново';
   $('progress').setAttribute('aria-valuemax', String(duration));
@@ -59,16 +60,17 @@ function reset({newText = true, focus = false} = {}) {
 function finish() {
   if (phase !== 'running') return;
   finalElapsed = elapsed(); phase = 'finished'; clearInterval(timerId); timerId = null;
-  input.disabled = true; $('typing-card').classList.add('finished'); changeSettingsDisabled(false);
   const result = refreshStats(finalElapsed);
   const best = getBest();
   const isRecord = result.speed > best && finalElapsed >= 5000;
   if (isRecord) { try { localStorage.setItem(storageKey(), String(result.speed)); } catch {} }
   $('record-label').hidden = !isRecord;
   $('result-title').textContent = isRecord ? 'Ваш новый лучший ритм.' : 'Отличная практика.';
-  $('result-description').textContent = `${result.speed} знаков в минуту · точность ${result.accuracy}% · верных знаков: ${result.correct}. Ещё один раунд?`;
-  $('result').hidden = false; setStatus('Тренировка завершена');
-  $('input-help').textContent = 'Каждая попытка — шаг вперёд'; $('restart').querySelector('span').textContent = 'Ещё раз'; showBest();
+  $('result-description').textContent = `${result.speed} знаков в минуту · точность ${result.accuracy}% · верных знаков: ${result.correct}.`;
+  $('result').hidden = false;
+  reset({keepResult: true, focus: document.activeElement === input});
+  setStatus('Новый текст готов — продолжайте');
+  $('input-help').textContent = 'Следующий раунд начнётся с первой буквы';
 }
 function tick() { if (phase !== 'running') return; if (elapsed() >= duration * 1000) finish(); else refreshStats(); }
 input.addEventListener('beforeinput', event => {
@@ -83,6 +85,7 @@ input.addEventListener('input', event => {
   const next = input.value.replace(/[\r\n]/g, ' ').slice(0, target.length);
   input.value = next;
   if (phase === 'idle' && next.length) {
+    $('result').hidden = true; $('record-label').hidden = true;
     phase = 'running'; startedAt = performance.now(); changeSettingsDisabled(true);
     timerId = setInterval(tick, 100); setStatus('Всё идёт своим ритмом', true); $('input-help').textContent = 'Ошибку можно исправить клавишей Backspace';
   }
@@ -101,9 +104,8 @@ document.querySelectorAll('[data-language]').forEach(button => button.addEventLi
   document.querySelectorAll('[data-language]').forEach(item => { const selected = item === button; item.classList.toggle('selected', selected); item.setAttribute('aria-pressed', String(selected)); });
   reset();
 }));
-$('new-text').addEventListener('click', () => reset({focus: true}));
-$('restart').addEventListener('click', () => reset({newText: false, focus: true}));
-document.addEventListener('keydown', event => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); reset({newText: false, focus: true}); } });
+$('restart').addEventListener('click', () => reset({focus: true}));
+document.addEventListener('keydown', event => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); reset({focus: true}); } });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
 window.addEventListener('pageshow', tick);
 reset();
